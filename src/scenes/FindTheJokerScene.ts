@@ -212,4 +212,5 @@ export default class FindTheJokerScene extends Phaser.Scene {
         this.add.dom(this.scale.width / 2, this.scale.height / 2, GameScoreComponent(scores, score,
             (scene: string) => this.scene.start(scene)) as HTMLElement)
     }
+
 }
