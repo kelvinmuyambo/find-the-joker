@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import FindTheJokerScene from "~/scenes/FindTheJokerScene";
+import {DelayService} from "~/services/DelayService";
 
 export class Card extends Phaser.GameObjects.Sprite {
     static defaultScale = 0.8;
@@ -8,12 +9,21 @@ export class Card extends Phaser.GameObjects.Sprite {
     face: string;
 
     constructor(scene: FindTheJokerScene, x: number, y: number, texture: string, frame: string) {
-        super(scene, x, y, texture, frame);
+        super(scene, scene.scale.width / 1.2, scene.scale.height / 1.2, texture, frame);
         scene.add.existing(this);
         this.scene = scene;
         this.face = frame;
         this.setScale(Card.defaultScale);
+        this.positionCard(x, y);
         this.setInteractive();
+    }
+
+    positionCard(x, y) {
+        this.scene.tweens.add({
+            targets: this,
+            x: {value: x, duration: 500, ease: 'Power2'},
+            y: {value: y, duration: 500, ease: 'Bounce.easeOut'}
+        });
     }
 
     delayedFlip = (delay: number) => setTimeout(() => this.flip(), delay)
@@ -55,7 +65,6 @@ export class Card extends Phaser.GameObjects.Sprite {
         timeline.play();
     }
 
-
     fold() {
         const timeline = this.scene.tweens.timeline({
             onComplete: () => timeline.destroy()
@@ -81,5 +90,14 @@ export class Card extends Phaser.GameObjects.Sprite {
         })
 
         timeline.play();
+    }
+
+    removeCard() {
+        this.scene.tweens.add({
+            targets: this,
+            x: {value: this.scene.scale.width, duration: 500, ease: 'Power2'},
+            y: {value: this.scene.scale.height, duration: 500, ease: 'Bounce.easeOut'}
+        });
+        DelayService.runDelayed(() => this.destroy(), 500).then(console.log);
     }
 }

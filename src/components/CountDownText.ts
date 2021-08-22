@@ -4,12 +4,12 @@ import FindTheJokerScene from "~/scenes/FindTheJokerScene";
 export class CountDownText extends Phaser.GameObjects.Text {
     scene: Phaser.Scene;
 
-    constructor(scene: FindTheJokerScene, x: number, y: number, text = 'Ready...') {
-        super(scene, x, y, text, null as any);
+    constructor(scene: FindTheJokerScene, text = 'Ready...') {
+        super(scene, scene.scale.width / 3, scene.scale.height / 2, text, null as any);
         this.scene = scene;
         const style: Phaser.GameObjects.TextStyle | any = {
             color: 'orange',
-            fontSize: '30px'
+            fontSize: '5em'
         };
         this.setAlign('center');
         this.setStyle(style);

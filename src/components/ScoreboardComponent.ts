@@ -28,7 +28,7 @@ export class ScoreboardComponent extends Phaser.GameObjects.Text {
         this.scene.data.set(Scoreboard.LIVES, 3);
         this.scene.data.set(Scoreboard.LEVEL, 1);
         this.scene.data.set(Scoreboard.SCORE, 0);
-        this.scene.data.set(Scoreboard.SPEED, 1500);
+        this.scene.data.set(Scoreboard.SPEED, 1000);
         this.scene.data.set(Scoreboard.CARDS, 2);
         this.scene.data.set(Scoreboard.SHUFFLES, 3);
     }
@@ -42,17 +42,15 @@ export class ScoreboardComponent extends Phaser.GameObjects.Text {
     }
 
     correctSelection() {
-        const speed: number = this.scene.data.get(Scoreboard.SPEED);
         const shuffles: number = this.scene.data.get(Scoreboard.SHUFFLES);
         if (shuffles >= 4) {
             const cards = this.scene.data.get(Scoreboard.CARDS);
             const level = this.scene.data.get(Scoreboard.LEVEL);
             this.scene.data.set(Scoreboard.CARDS, cards + 1);
-            this.scene.data.set(Scoreboard.SPEED, 2000);
+            // this.scene.data.set(Scoreboard.SPEED, 1000);
             this.scene.data.set(Scoreboard.SHUFFLES, 3);
             this.scene.data.set(Scoreboard.LEVEL, level + 1);
         } else {
-            this.scene.data.set(Scoreboard.SPEED, speed - 600);
             this.scene.data.set(Scoreboard.SHUFFLES, shuffles + 1);
         }
         const score = this.scene.data.get(Scoreboard.SCORE);
