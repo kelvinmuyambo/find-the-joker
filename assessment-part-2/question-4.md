@@ -21,5 +21,21 @@ export class Soldier {
 }
 ````
 
+###2. OBSERVER
+This design pattern defines a one-to-many dependency between objects so that when one object changes state, 
+all its dependents are notified and updated automatically.
+####EXAMPLE
+
+```typescript
+
+```
 
 
+###3. ITERATOR
+This design pattern provides a way to access the elements of an aggregate object 
+sequentially without exposing its underlying representation.
+
+
+```typescript
+
+```
