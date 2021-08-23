@@ -11,6 +11,7 @@ import {DatabaseService} from "~/services/DatabaseService";
 import {Score} from "~/interfaces/Score";
 import GameScoreComponent from "~/components/GameScoreComponent";
 import MuteComponent from "~/components/MuteComponent";
+import {SoundBoardService} from "~/services/SoundBoardService";
 
 export default class FindTheJokerScene extends Phaser.Scene {
     // TODO: CLASS DECONGESTING, DEDICATE OTHER FUNCTIONALITY TO ANOTHER CLASS
@@ -22,11 +23,8 @@ export default class FindTheJokerScene extends Phaser.Scene {
     countDownText: CountDownText = null as any;
     scoreBoard: ScoreboardComponent = null as any;
     ready = false;
-    shuffleSound: Phaser.Sound.BaseSound = null as any;
-    wrongCardSound: Phaser.Sound.BaseSound = null as any;
-    correctCardSound: Phaser.Sound.BaseSound = null as any;
+    soundBoard: SoundBoardService = null as any;
     muteButton: Phaser.GameObjects.DOMElement = null as any;
-    soundOn = true;
 
 
     constructor() {
@@ -44,9 +42,10 @@ export default class FindTheJokerScene extends Phaser.Scene {
     create() {
         SceneService.loadBackground(this, 'poker_bg');
         this.countDownText = new CountDownText(this);
-        this.shuffleSound = this.sound.add('shuffle');
-        this.wrongCardSound = this.sound.add('wrong_card');
-        this.correctCardSound = this.sound.add('correct_card');
+        this.soundBoard = new SoundBoardService({
+            scene: this,
+            keys: ['wrong_card', 'correct_card', 'shuffle']
+        });
         this.countDownText.start(() => this.loadGameObjects());
         this.loadMuteComponent();
     }
@@ -54,8 +53,8 @@ export default class FindTheJokerScene extends Phaser.Scene {
     loadMuteComponent() {
         if (this.muteButton)
             this.muteButton.destroy();
-        const muteComponent: HTMLElement = MuteComponent(this.soundOn, (soundOn) => {
-            this.soundOn = soundOn;
+        const muteComponent: HTMLElement = MuteComponent(this.soundBoard.soundOn, (soundOn) => {
+            this.soundBoard.toggleSound(soundOn);
             this.loadMuteComponent();
         });
         this.muteButton = this.add.dom(this.scale.width - 100, 30, muteComponent);
@@ -122,14 +121,11 @@ export default class FindTheJokerScene extends Phaser.Scene {
     }
 
     async doShuffle() {
-        DelayService.runDelayed(() => {
-            if (this.soundOn)
-                this.shuffleSound.play();
-        }, 1000).then(console.log)
+        DelayService.runDelayed(() => this.soundBoard.play('shuffle'), 1000).then(console.log)
         for (let i = 0; i < this.shuffleCount; i++) {
             await this.doTimedShuffle();
         }
-        this.shuffleSound.stop();
+        this.soundBoard.stop('shuffle');
     }
 
     doTimedShuffle() {
@@ -156,10 +152,7 @@ export default class FindTheJokerScene extends Phaser.Scene {
         if (!this.ready) return;
         this.ready = false;
         card.flip();
-        if (this.soundOn) {
-            if (isJoker) this.correctCardSound.play();
-            else this.wrongCardSound.play();
-        }
+        this.soundBoard.play(isJoker ? 'correct_card': 'wrong_card');
         await DelayService.runDelay(1000 + this.shuffleSpeed);
         card.flip();
         await DelayService.runDelay(1000);
