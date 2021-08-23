@@ -13,6 +13,7 @@ import GameScoreComponent from "~/components/GameScoreComponent";
 import MuteComponent from "~/components/MuteComponent";
 
 export default class FindTheJokerScene extends Phaser.Scene {
+    // TODO: CLASS DECONGESTING, DEDICATE OTHER FUNCTIONALITY TO ANOTHER CLASS
     cards: Card[] = [];
     gridItems: GridItem[] = [];
     frames: string[] = [];
