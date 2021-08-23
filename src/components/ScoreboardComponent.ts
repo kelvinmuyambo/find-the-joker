@@ -47,7 +47,6 @@ export class ScoreboardComponent extends Phaser.GameObjects.Text {
             const cards = this.scene.data.get(Scoreboard.CARDS);
             const level = this.scene.data.get(Scoreboard.LEVEL);
             this.scene.data.set(Scoreboard.CARDS, cards + 1);
-            // this.scene.data.set(Scoreboard.SPEED, 1000);
             this.scene.data.set(Scoreboard.SHUFFLES, 3);
             this.scene.data.set(Scoreboard.LEVEL, level + 1);
         } else {

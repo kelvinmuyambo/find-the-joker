@@ -18,6 +18,11 @@ const ScoreTableComponent = (scoreTable: ScoreTable, callback: Function) => {
                     <td><b>{score.score}</b></td>
                 </tr>)
             }
+            {
+                scores.length < 1 && <tr>
+                    <td colSpan={2} class='text-center'><small><i>no data available</i></small></td>
+                </tr>
+            }
             </tbody>
         </table>
     }

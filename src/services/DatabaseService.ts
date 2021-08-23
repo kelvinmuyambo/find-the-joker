@@ -8,7 +8,7 @@ export class DatabaseService extends Dexie {
     public constructor() {
         super("FindTheJokerDatabase");
         this.version(1).stores({
-            scores: "++score,level,date"
+            scores: "++id,score,level,date"
         });
         this.scores = this.table("scores");
     }

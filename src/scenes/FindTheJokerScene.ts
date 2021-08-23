@@ -5,13 +5,11 @@ import {GridItem} from "~/interfaces/GridItem";
 import {SceneService} from "~/services/SceneService";
 import {CountDownText} from "~/components/CountDownText";
 import {ScoreboardComponent} from "~/components/ScoreboardComponent";
-import {DelayService} from "~/services/DelayService";
 import {Scoreboard} from "~/models/Scoreboard";
-import {DatabaseService} from "~/services/DatabaseService";
-import {Score} from "~/interfaces/Score";
-import GameScoreComponent from "~/components/GameScoreComponent";
 import MuteComponent from "~/components/MuteComponent";
 import {SoundBoardService} from "~/services/SoundBoardService";
+import {CardSelectionService} from "~/services/CardSelectionService";
+import {CardShuffleService} from "~/services/CardShuffleService";
 
 export default class FindTheJokerScene extends Phaser.Scene {
     // TODO: CLASS DECONGESTING, DEDICATE OTHER FUNCTIONALITY TO ANOTHER CLASS
@@ -69,10 +67,10 @@ export default class FindTheJokerScene extends Phaser.Scene {
     loadCards() {
         const numberOfCards = this.data.get(Scoreboard.CARDS);
         this.gridItems = GridService.getItems({
-            startX: 150,
-            startY: 100,
-            endX: this.scale.height - 100,
-            endY: this.scale.width - 100
+            startX: 0,
+            startY: 150,
+            endX: this.scale.width,
+            endY: this.scale.height - 100
         }, numberOfCards);
         this.frames = this.textures.get('cards')
             .getFrameNames()
@@ -81,7 +79,7 @@ export default class FindTheJokerScene extends Phaser.Scene {
         if (!this.frames.includes('joker'))
             this.frames.splice(0, 1, 'joker');
         this.assignCardsToGrid();
-        setTimeout(() => this.doShuffle().then(() => this.ready = true), 1000);
+        setTimeout(() => new CardShuffleService(this).doShuffle().then(() => this.ready = true), 1000);
     }
 
     assignCardsToGrid() {
@@ -94,7 +92,7 @@ export default class FindTheJokerScene extends Phaser.Scene {
     assignNewCard(position: number) {
         const gridItem = this.gridItems[position];
         const card: Card = new Card(this, gridItem.x, gridItem.y, 'cards', this.frames[position]);
-        card.on(Phaser.Input.Events.POINTER_UP, () => this.cardSelected(card));
+        card.on(Phaser.Input.Events.POINTER_UP, () => new CardSelectionService(this).cardSelected(card));
         card.delayedFlip(card.face == 'joker' ? 800 : 0);
         this.cards.push(card);
     }
@@ -119,92 +117,4 @@ export default class FindTheJokerScene extends Phaser.Scene {
             y: {value: gridItem.y, duration: this.shuffleSpeed, ease: 'Bounce.easeOut', delay: this.shuffleSpeed}
         });
     }
-
-    async doShuffle() {
-        DelayService.runDelayed(() => this.soundBoard.play('shuffle'), 1000).then(console.log)
-        for (let i = 0; i < this.shuffleCount; i++) {
-            await this.doTimedShuffle();
-        }
-        this.soundBoard.stop('shuffle');
-    }
-
-    doTimedShuffle() {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                this.fisherYatesShuffle();
-                resolve();
-            }, 1000);
-        });
-    }
-
-    fisherYatesShuffle() {
-        for (let i = this.gridItems.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const temp = this.gridItems[i];
-            this.gridItems[i] = this.gridItems[j];
-            this.gridItems[j] = temp;
-        }
-        this.assignCardsToGrid();
-    }
-
-    async cardSelected(card: Card) {
-        const isJoker = card.face == 'joker';
-        if (!this.ready) return;
-        this.ready = false;
-        card.flip();
-        this.soundBoard.play(isJoker ? 'correct_card': 'wrong_card');
-        await DelayService.runDelay(1000 + this.shuffleSpeed);
-        card.flip();
-        await DelayService.runDelay(1000);
-        if (!isJoker) await this.wrongCardSelected()
-        else await this.correctCardSelected();
-        this.scoreBoard.load();
-        this.ready = true;
-    }
-
-    async wrongCardSelected() {
-        const hasLife = this.scoreBoard.wrongSelection();
-        const jokerCard = this.cards.find(f => f.face == 'joker');
-        if (jokerCard) {
-            jokerCard.flip();
-            await DelayService.runDelay(1000);
-            jokerCard.flip();
-        }
-
-        if (hasLife) await this.doShuffle();
-        else await this.initiateGameOver();
-    }
-
-    async correctCardSelected() {
-        this.scoreBoard.correctSelection();
-        this.loadScoreBoardData();
-        this.cards.forEach(card => card.removeCard());
-        this.cards = [];
-        await DelayService.runDelay(1000);
-        this.loadCards();
-    }
-
-    loadScoreBoardData() {
-        this.shuffleSpeed = this.data.get(Scoreboard.SPEED);
-        this.shuffleCount = this.data.get(Scoreboard.SHUFFLES);
-    }
-
-    async initiateGameOver() {
-        const score: Score = {
-            score: this.data.get(Scoreboard.SCORE),
-            level: this.data.get(Scoreboard.LEVEL),
-            date: new Date()
-        };
-        await new DatabaseService().saveScore(score);
-        await this.loadScore(score);
-    }
-
-    async loadScore(score: Score) {
-        const scores = await new DatabaseService().getScores();
-        this.cards.forEach(card => card.removeCard());
-        this.scoreBoard.destroy();
-        this.add.dom(this.scale.width / 2, this.scale.height / 2, GameScoreComponent(scores, score,
-            (scene: string) => this.scene.start(scene)) as HTMLElement)
-    }
-
 }

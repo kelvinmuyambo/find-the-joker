@@ -3,21 +3,21 @@ import {GridItem} from "~/interfaces/GridItem";
 
 export class GridService {
     static maxItemsX = 4;
-    static itemWidth = 170;
-    static itemHeight = 150;
+    static itemWidth = 150;
+    static itemHeight = 180;
 
     static getItems(config: GridConfig, count: number): GridItem[] {
         const width = config.endX - config.startX;
         const height = config.endY = config.startY;
         const items: GridItem[] = [];
         const grid = this.optimiseGrid(this.gridData(count));
-        for (let x = 0; x < grid.length; x++) {
-            const row = grid[x];
-            for (let y = 0; y < row.length; y++) {
-                const adjustmentX = width / (row.length * 2);
+        for (let y = 0; y < grid.length; y++) {
+            const column = grid[y];
+            for (let x = 0; x < column.length; x++) {
+                const adjustmentX = width / (column.length * 2);
                 const adjustmentY = height / (grid.length * 2);
-                const yPoint = config.startX + adjustmentX + (x * this.itemWidth);
-                const xPoint = config.startY + adjustmentY + (y * this.itemHeight);
+                const xPoint = config.startX + adjustmentX + (x * this.itemWidth);
+                const yPoint = config.startY + adjustmentY + (y * this.itemHeight);
                 items.push({x: xPoint, y: yPoint, id: `${x}${y}`});
             }
         }
