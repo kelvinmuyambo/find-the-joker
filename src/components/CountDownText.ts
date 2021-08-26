@@ -1,10 +1,11 @@
 import Phaser from "phaser";
 import FindTheJokerScene from "~/scenes/FindTheJokerScene";
+import CardDeckScene from "~/scenes/CardDeckScene";
 
 export class CountDownText extends Phaser.GameObjects.Text {
     scene: Phaser.Scene;
 
-    constructor(scene: FindTheJokerScene, text = 'Ready...') {
+    constructor(scene: CardDeckScene, text = 'Ready...') {
         super(scene, scene.scale.width / 3, scene.scale.height / 2, text, null as any);
         this.scene = scene;
         const style: Phaser.GameObjects.TextStyle | any = {

@@ -56,4 +56,15 @@ export class GridService {
         }
         return grid;
     }
+
+    static shuffle(gridItems: GridItem[]): GridItem[] {
+        if (!gridItems || gridItems.length < 1) return [];
+        for (let i = gridItems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = gridItems[i];
+            gridItems[i] = gridItems[j];
+            gridItems[j] = temp;
+        }
+        return gridItems;
+    }
 }

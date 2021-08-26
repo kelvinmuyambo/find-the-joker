@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import FindTheJokerScene from "~/scenes/FindTheJokerScene";
 import {DelayService} from "~/services/DelayService";
+import CardDeckScene from "~/scenes/CardDeckScene";
 
 export class Card extends Phaser.GameObjects.Sprite {
     static defaultScale = 0.8;
@@ -8,7 +9,7 @@ export class Card extends Phaser.GameObjects.Sprite {
     scene: Phaser.Scene;
     face: string;
 
-    constructor(scene: FindTheJokerScene, x: number, y: number, texture: string, frame: string) {
+    constructor(scene: CardDeckScene, x: number, y: number, texture: string, frame: string) {
         super(scene, scene.scale.width / 1.2, scene.scale.height / 1.2, texture, frame);
         scene.add.existing(this);
         this.scene = scene;
