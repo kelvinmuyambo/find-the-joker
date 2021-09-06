@@ -28,6 +28,21 @@ all its dependents are notified and updated automatically.
 
 ```typescript
 
+export class CardDeck {
+    // assuming shuffling is a long running task
+    shuffleCards(onComplete: Function){
+        new Promise((resolve, reject) => {
+           //shuffling logic here
+            
+            // after shuffling take result
+           const resultData = {};
+           // 'notify' completion by use of callback func and return data
+            resolve(resultData);
+            onComplete(resultData);
+        });
+    }
+}
+
 ```
 
 
